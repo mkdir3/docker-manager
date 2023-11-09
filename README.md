@@ -27,7 +27,7 @@ Docker Manager uses a projects.json file to store project configurations. If the
 Example projects.json:
 ```json
 {
-  "ProjectName": "My Amazing Project,
+  "ProjectName": "My Amazing Project",
   "AnotherProject": "/path/to/docker-compose.yml"
 }
 ```
