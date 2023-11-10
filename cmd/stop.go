@@ -30,7 +30,7 @@ var stopCmd = &cobra.Command{
 			fmt.Printf("Failed to stop project %s: %v\n", projectName, err)
 			return
 		}
-		fmt.Printf("Stopped project %s\n", projectName)
+		fmt.Printf("Stopped project %s\n 🌚", projectName)
 	},
 }
 

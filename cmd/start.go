@@ -18,6 +18,8 @@ var startCmd = &cobra.Command{
 		projectPath, ok := docker.Projects[projectName]
 		if !ok {
 			fmt.Printf("Unknown project: %s\n", projectName)
+			fmt.Printf("Use manage command in order to remove it\n")
+			utils.ExitInfo()
 			return
 		}
 		projectDir, err := utils.ResolveHomeDir(projectPath)
@@ -28,9 +30,10 @@ var startCmd = &cobra.Command{
 		err = docker.ExecuteDockerComposeCommand(projectDir, "up", "-d")
 		if err != nil {
 			fmt.Printf("Failed to start project %s: %v\n", projectName, err)
+			docker.RemoveSingleProject(projectName)
 			return
 		}
-		fmt.Printf("Started project %s\n", projectName)
+		fmt.Printf("Started project %s\n 🌞", projectName)
 	},
 }
 

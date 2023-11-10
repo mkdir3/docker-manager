@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"docker-manager/pkg/utils"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -14,7 +15,6 @@ func LoadProjectsFromFile(filename string) error {
 		return err
 	}
 
-	// Unmarshal the JSON into the Projects map
 	err = json.Unmarshal(data, &Projects)
 	if err != nil {
 		return err
@@ -23,14 +23,12 @@ func LoadProjectsFromFile(filename string) error {
 	return nil
 }
 
-// SaveProjectsToFile saves the Projects map to a JSON file
 func SaveProjectsToFile(filename string) error {
 	data, err := json.Marshal(Projects)
 	if err != nil {
 		return err
 	}
 
-	// Write the JSON to the file
 	err = os.WriteFile(filename, data, os.ModePerm)
 	if err != nil {
 		return err
@@ -51,13 +49,14 @@ func CheckAndLoadProjectsFile(filePath string) error {
 			AddProject()
 			SaveProjectsToFile(filePath)
 		} else {
-			fmt.Println("No projects file found. Exiting.")
-			os.Exit(1)
+			utils.ExitInfo()
+			os.Exit(0)
 		}
 	} else {
-		// Load projects from file
 		if err := LoadProjectsFromFile(filePath); err != nil {
-			return fmt.Errorf("Failed to load projects: %v", err)
+			fmt.Println()
+			fmt.Printf("⚠️ Failed to load projects: %v\n", err)
+			utils.ExitInfo()
 		}
 	}
 	return nil

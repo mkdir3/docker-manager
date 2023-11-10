@@ -12,7 +12,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "docker-manager",
 	Short: "CLI app to manage Dockerized projects",
-	Long:  `A CLI app to manage Dockerized projects. It can start, stop and list running Docker containers.`,
+	Long:  `A CLI app to manage Dockerized projects. It can start, stop, list and manage running Docker containers.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if err := docker.CheckAndLoadProjectsFile("projects.json"); err != nil {
 			fmt.Println(err)
@@ -29,7 +29,9 @@ var rootCmd = &cobra.Command{
 		for _, projectName := range selectedProjects {
 			projectPath, ok := docker.Projects[projectName]
 			if !ok {
+				// TODO: FAIL HERE
 				fmt.Printf("Unknown project: %s\n", projectName)
+				docker.RemoveSingleProject(projectName)
 				continue
 			}
 			projectDir, err := utils.ResolveHomeDir(projectPath)

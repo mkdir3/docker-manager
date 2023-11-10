@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"docker-manager/pkg/utils"
 	"fmt"
 	"sort"
 
@@ -10,10 +11,7 @@ import (
 var Projects = make(map[string]string)
 
 func init() {
-	// Load projects from file when the package is initialized
 	if err := LoadProjectsFromFile("projects.json"); err != nil {
-		// Handle error, e.g., log it or print it
-		// For now, let's just initialize an empty Projects map
 		Projects = make(map[string]string)
 	}
 }
@@ -31,6 +29,7 @@ func AddProject() {
 	var projectName, projectPath string
 	survey.AskOne(&survey.Input{Message: "Enter the project name:"}, &projectName)
 	survey.AskOne(&survey.Input{Message: "Enter the project path:"}, &projectPath)
+	utils.PathChecker(projectPath)
 
 	var confirm string
 	confirmPrompt := &survey.Select{
@@ -41,7 +40,7 @@ func AddProject() {
 
 	if confirm == "Yes" {
 		Projects[projectName] = projectPath
-		SaveProjectsToFile("projects.json")	
+		SaveProjectsToFile("projects.json")
 		fmt.Printf("Added project %s\n", projectName)
 	}
 }
@@ -51,14 +50,39 @@ func RemoveProject() error {
 	survey.AskOne(&survey.Input{Message: "Enter the project name you'd like to remove:"}, &projectName)
 
 	if _, exists := Projects[projectName]; !exists {
-		return fmt.Errorf("Project %s does not exist", projectName)
+		return fmt.Errorf("project %s does not exist", projectName)
 	}
 
 	delete(Projects, projectName)
 
 	if err := SaveProjectsToFile("projects.json"); err != nil {
-		return fmt.Errorf("Failed to save projects after removal: %v", err)
+		return fmt.Errorf("failed to save projects after removal: %v", err)
 	}
 
+	return nil
+}
+
+func RemoveSingleProject(projectName string) error {
+	if _, exists := Projects[projectName]; !exists {
+		return fmt.Errorf("project %s does not exist", projectName)
+	}
+
+	var confirm string
+	confirmPrompt := &survey.Select{
+		Message: fmt.Sprintf("Do you want to remove unexisting project %s from the list?", projectName),
+		Options: []string{"Yes", "No"},
+	}
+	survey.AskOne(confirmPrompt, &confirm)
+
+	if confirm == "Yes" {
+		delete(Projects, projectName)
+		if err := SaveProjectsToFile("projects.json"); err != nil {
+			return fmt.Errorf("failed to save projects after removal: %v", err)
+		}
+		fmt.Printf("\nProject %s removed successfully.", projectName)
+		return nil
+	}
+
+	fmt.Printf("\nProject %s has not been removed.", projectName)
 	return nil
 }
